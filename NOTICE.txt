@@ -1,0 +1,7 @@
+This project contains the script 'lein' for the optional dependency 'Leiningen', 
+a project for automating Clojure projects, which can be obtained at:
+
+  * LICENSE:
+    * https://github.com/technomancy/leiningen/blob/master/COPYING (Eclipse Public License v1.0)
+  * HOMEPAGE:
+    * https://github.com/technomancy/leiningen

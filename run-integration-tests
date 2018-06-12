@@ -1,0 +1,158 @@
+#!/bin/bash
+
+#
+# Copyright 2017-present Pandora Media, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# The integration tests spin up a local Zookeeper/Kafka,
+# insert data, and then query via KBrowse.
+
+set -e -o pipefail
+
+
+# Shutdown child processes on exit.
+KBROWSE_SERVER_PID=''
+ZK_KAFKA_PID=''
+function _stop {
+    EXITING_CODE=$?
+    if [ $EXITING_CODE != 0 ]; then
+        echo
+        echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        echo Error in run-integration-tests
+        echo
+    fi
+
+    if [ ! -z "$KBROWSE_SERVER_PID" ]; then
+        echo Stopping KBrowse
+        kill -9 $KBROWSE_SERVER_PID
+    fi
+
+    if [ ! -z "$ZK_KAFKA_PID" ]; then
+        echo Stopping Zookeeper/Kafka Parent
+        kill -TERM $ZK_KAFKA_PID
+        wait $ZK_KAFKA_PID
+    fi
+
+    echo
+    echo Exiting
+
+    exit $EXITING_CODE
+}
+trap _stop SIGINT SIGKILL SIGTERM TERM
+
+
+# Because it's a local cluster, we can use a low timeout,
+# which helps the tests run faster.  This affects the KBrowse server,
+# as well as the CLI tests.
+export KAFKA_TIMEOUT=1000
+
+echo
+echo Building KBrowse
+./lein uberjar
+
+# Fetch the Kafka binaries, so that ./run-zookeeper-and-kafka
+# takes a consistent amount of time (which informs the subsequent sleep).
+echo
+echo Fetching Kafka
+./fetch-kafka-tgz
+
+./run-zookeeper-and-kafka &
+ZK_KAFKA_PID=$!
+
+# Give Kafka a chance to start up.
+sleep 15
+
+echo
+echo Starting KBrowse
+java -jar target/kbrowse-*-standalone.jar server &
+KBROWSE_SERVER_PID=$!
+
+# Give KBrowse a chance to start up.
+sleep 5
+
+
+#############
+# Run Tests #
+#############
+
+
+echo
+echo Running CLI tests
+
+
+./kafka/bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic topic-a --partitions 10 --replication-factor 1 > /dev/null
+echo k0,v0 | ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic-a --property parse.key=true --property key.separator=, > /dev/null
+
+# Use the same key, so it goes to the same partition
+echo k0,v1 | ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic-a --property parse.key=true --property key.separator=, > /dev/null
+
+# Use a different key, so it goes to a different partition
+echo k2,v2 | ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic-a --property parse.key=true --property key.separator=, > /dev/null
+
+
+echo testing-key-exact-match
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --key-regex 'k0')
+python <<EOF
+import json
+assert 'v0' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo testing-key-fuzzy-match
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --key-regex 'k.*')
+python <<EOF
+import json
+assert 'v0' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo testing-value-exact-match
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --val-regex 'v0')
+python <<EOF
+import json
+assert 'v0' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo testing-value-fuzzy-match
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --val-regex 'v.*')
+python <<EOF
+import json
+assert 'v0' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo testing-relative-offset
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --relative-offset 1)
+python <<EOF
+import json
+assert 'v1' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo testing-partition
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --partitions 3)
+python <<EOF
+import json
+assert 'v2' == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
+echo
+echo Running web console tests
+node test-console.js
+
+
+_stop

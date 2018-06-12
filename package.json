@@ -1,0 +1,11 @@
+{
+    "devDependencies": {
+        "eslint": "v4.19.1",
+        "eslint-config-google": "0.9.1",
+        "puppeteer": "v1.4.0",
+        "thread-sleep": "2.0.0"
+    },
+    "scripts": {
+        "lint": "./node_modules/.bin/eslint --config node_modules/eslint-config-google/index.js resources/public/main.js"
+    }
+}

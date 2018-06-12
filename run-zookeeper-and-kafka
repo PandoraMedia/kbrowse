@@ -1,0 +1,93 @@
+#!/bin/bash
+
+#
+# Copyright 2017-present Pandora Media, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Run a local Zookeeper/Kafka cluster, and insert some test data.
+
+set -e -o pipefail
+
+
+# Shutdown child processes on exit.
+ZOOKEEPER_PID=''
+KAFKA_SERVER_PID=''
+function _stop {
+    EXITING_CODE=$?
+    if [ $EXITING_CODE != 0 ]; then
+        echo
+        echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        echo Error in run-zookeeper-and-kafka
+        echo
+    fi
+
+    echo
+    if [ ! -z "$ZOOKEEPER_PID" ]; then
+        echo Stopping Zookeeper
+        kill -9 $ZOOKEEPER_PID
+    fi
+
+    if [ ! -z "$KAFKA_SERVER_PID" ]; then
+        echo Stopping Kafka Server
+        kill -9 $KAFKA_SERVER_PID
+    fi
+
+    exit $EXITING_CODE
+}
+trap _stop SIGINT SIGKILL SIGTERM TERM
+
+
+# Fetch binaries and reset data
+./fetch-kafka-tgz
+rm -rf kafka/kafka_2*/ kafka-logs zookeeper
+tar xf kafka*.tgz
+mv kafka_2*/ kafka
+
+
+ZOOKEEPER_CONFIG=kafka/config/zookeeper-kbrowse.properties
+sed -e 's|dataDir=/tmp/zookeeper|dataDir=zookeeper|' \
+    kafka/config/zookeeper.properties > $ZOOKEEPER_CONFIG
+echo Starting Zookeeper
+./kafka/bin/zookeeper-server-start.sh $ZOOKEEPER_CONFIG > /dev/null &
+ZOOKEEPER_PID=$!
+
+# Wait for Zookeeper to be up, so that Kafka server can connect.
+sleep 8
+
+
+KAFKA_SERVER_CONFIG=kafka/config/server-kbrowse.properties
+sed -e 's|#listeners.*|listeners=PLAINTEXT://localhost:9092|' \
+    -e 's|log.dirs=/tmp/kafka-logs|log.dirs=kafka-logs|' \
+    kafka/config/server.properties > $KAFKA_SERVER_CONFIG
+echo Starting Kafka Server
+./kafka/bin/kafka-server-start.sh $KAFKA_SERVER_CONFIG > /dev/null &
+KAFKA_SERVER_PID=$!
+
+# Wait for Kafka server to be up, so consumers can connect.
+sleep 5
+
+
+# Enter some initial test data.
+echo
+./kafka/bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic kbrowse --partitions 10 --replication-factor 1
+
+echo Inserting test data...
+echo k,v | ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic kbrowse --property parse.key=true --property key.separator=,
+
+echo
+echo
+echo Zookeeper/Kafka ready...
+
+while true; do sleep 1; done

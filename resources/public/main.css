@@ -1,0 +1,140 @@
+/**
+ * Copyright 2017-present Pandora Media, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+body {
+    font-family: Monospace;
+}
+
+a {
+    color: black;
+    font-weight: bold;
+}
+
+#console-title {
+    margin-left: 10px;
+    font-family: Helvetica, sans-serif;
+    font-style: italic;
+    color: #555555;
+}
+
+#code-link {
+    position: fixed;
+    top: 30px;
+    left: 600px;
+}
+
+#search-form-left-container {
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 350px;
+    height: 145px;
+}
+
+#search-form-right-container {
+    display: inline-block;
+    margin-left: 10px;
+    width: 350px;
+    height: 145px;
+}
+
+#search-form-left {
+    position: absolute;
+    padding: 10px;
+}
+
+#search-form-right {
+    position: absolute;
+}
+
+.search-form-line {
+    margin-top: 3px;
+}
+
+.search-form-left-input {
+    position: absolute;
+    left: 100px;
+}
+
+.search-form-right-input {
+    position: absolute;
+    left: 185px;
+}
+
+#default-partition-lookup {
+    position: absolute;
+    left: 208px;
+}
+
+#schema-registry-url-label {
+    opacity: 0.5;
+}
+
+#schema-registry-url {
+    disabled: true;
+    /* Hack to keep from being displayed on new line */
+    top: 67px;
+}
+
+#topic {
+    width: 250px;
+}
+
+#loading {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 425px;
+    width: 195px;
+    padding: 10px;
+    background: white;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+}
+
+#results-div {
+    margin-left: 12px;
+}
+
+#dialog-bg {
+    display: none;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#dialog-fg {
+    display: none;
+    overflow: auto;
+    width: 75%;
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    background: white;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+#error {
+    color: red;
+}
