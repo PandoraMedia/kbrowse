@@ -1,0 +1,4 @@
+sudo: required
+addons:
+  chrome: stable
+script: ./run-tests
