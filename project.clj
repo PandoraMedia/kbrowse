@@ -39,7 +39,6 @@
          ; and removes "Transfer-Encoding": "chunked".
          :adapter {:output-buffer-size 100}}
   :main kbrowse.core
-  :aot [kbrowse.msgpack]
   :profiles {:uberjar {:aot :all}}
   :test-selectors {:default (complement :integration)
                    :integration :integration})
