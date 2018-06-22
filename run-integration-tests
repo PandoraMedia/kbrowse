@@ -50,7 +50,7 @@ function _stop {
 
     exit $EXITING_CODE
 }
-trap _stop SIGINT SIGKILL SIGTERM TERM
+trap _stop EXIT SIGINT SIGKILL SIGTERM TERM
 
 
 # Because it's a local cluster, we can use a low timeout,
@@ -153,6 +153,3 @@ EOF
 echo
 echo Running web console tests
 node test-console.js
-
-
-_stop
