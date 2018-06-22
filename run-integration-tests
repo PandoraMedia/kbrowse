@@ -150,6 +150,14 @@ assert 'v2' == json.loads("""$OUTPUT""")[1]['value']
 EOF
 
 
+echo testing-msgpack
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --value-deserializer "kbrowse.msgpack.MsgpackDeserializer")
+python <<EOF
+import json
+assert 118 == json.loads("""$OUTPUT""")[1]['value']
+EOF
+
+
 echo
 echo Running web console tests
 node test-console.js

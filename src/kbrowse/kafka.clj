@@ -17,7 +17,11 @@
 (ns kbrowse.kafka
   "Wrap the Java client."
   (:require [clojure.string :as string]
-            [kbrowse.config :as config])
+            [kbrowse.config :as config]
+            ; Ensure msgpack is loaded.
+            ; It's not required initially, but may be passed in as a
+            ; deserializer to be used when instantiating a consumer.
+            [kbrowse.msgpack])
   (:import java.util.ArrayList
            org.apache.kafka.clients.consumer.ConsumerConfig
            org.apache.kafka.clients.consumer.KafkaConsumer
