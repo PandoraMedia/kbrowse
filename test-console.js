@@ -34,6 +34,7 @@ const threadSleep = require('thread-sleep');
         await runTest(browser, checkIDs);
         await runTest(browser, searchSomeResults);
         await runTest(browser, searchNoResults);
+        await runTest(browser, topicsRefresh);
 
         await browser.close();
     } catch (error) {
@@ -108,4 +109,35 @@ async function searchNoResults(page) {
     threadSleep(500);
     const resultsHTML = await page.evaluate(results => results.innerHTML, await page.$('#results'));
     assert(resultsHTML == "");
+}
+
+// Ensure the topics list is updated when the bootstrap servers are changed.
+async function topicsRefresh(page) {
+
+    await page.evaluate(_ => {
+        // Remove all topics
+        const topic = document.getElementById('topic');
+        console.log("topic.length: " + topic.length);
+        while (topic.length > 0) {
+          topic.removeChild(topic.childNodes[0]);
+        }
+    });
+
+    // Topic should be empty
+    assert.equal(
+      await (await (await page.$('#topic')).getProperty('length')).jsonValue(),
+      0
+    );
+
+    // Trigger topic update
+    await page.evaluate(_ => {
+        const bootstrapServers = document.getElementById('bootstrap-servers');
+        bootstrapServers.onchange();
+    });
+
+    // Topic should be populated again
+    assert.equal(
+      await (await (await page.$('#topic')).getProperty('length')).jsonValue(),
+      1
+    );
 }
