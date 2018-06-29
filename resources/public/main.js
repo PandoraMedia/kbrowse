@@ -44,7 +44,16 @@
       populateFromUri();
       hideLoading();
       initDialog();
+
+      // Save state in URL on every change.
+      // Add onchange events here at the top, to allow overriding.
+      let elements = document.getElementById('query-form').elements;
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].onchange = updateDataURL;
+      }
+
       document.getElementById('bootstrap-servers').onchange = function() {
+        updateDataURL();
         let servers = document.getElementById('bootstrap-servers').value;
         updateTopics(bootstrapTopics[servers],
                document.getElementById('topic').value);
@@ -63,12 +72,6 @@
       bindHelp('help-offset', offsetHelpText);
       bindHelp('help-follow', followHelpText);
       bindHelp('help-partition-csv', partitionCSVHelpText);
-
-      // Save state in URL on every change.
-      let elements = document.getElementById('query-form').elements;
-      for (let i = 0; i < elements.length; i++) {
-        elements[i].onchange = updateDataURL;
-      }
 
       loadCached();
     });
