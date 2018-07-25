@@ -31,12 +31,6 @@
    so that every real result can safely prepend a comma."
   (cheshire/generate-string {:type :pioneer}))
 
-(defn result?
-  "Does this record match the given query params?"
-  [key-regex val-regex record]
-  (and (or (nil? key-regex) (re-matches key-regex (.key record)))
-       (or (nil? val-regex) (re-matches val-regex (.value record)))))
-
 (defn to-map
   "Convert a kafka record object."
   [record]
@@ -59,6 +53,15 @@
         (cheshire/generate-string {:pretty true}))
     (catch Exception e
       (cheshire/generate-string map* {:pretty true}))))
+
+(defn result?
+  "Does this record match the given query params?"
+  [key-regex val-regex record]
+  (let [record-map (to-map record)
+        key-str (str (:key record-map))
+        value-str (str (:value record-map))]
+    (and (or (nil? key-regex) (re-matches key-regex key-str))
+         (or (nil? val-regex) (re-matches val-regex value-str)))))
 
 (defn progress-message
   "Format the progress message for client consumption."
