@@ -67,7 +67,7 @@
     (-> record
         to-map
         (assoc :type :offset :timestamp timestamp-date)
-        (cheshire/generate-string {:pretty true})
+        (to-result-string)
         (#(str ", " %)))))
 
 (defn maybe-send-progress
