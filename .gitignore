@@ -17,6 +17,7 @@
 /.lein-*
 /.nrepl-port
 /.venv*
+/.idea*
 /classes
 /checkouts
 /dist

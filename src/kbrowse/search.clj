@@ -41,18 +41,35 @@
    :key (.key record)
    :value (.value record)})
 
-(defn to-result-string
-  "Attempt to convert result map to a pretty JSON string.
+(defn value-to-result-string
+  "Attempt to convert result map value to a JSON string.
    If parsing fails, return as is."
   [map*]
   (try
     (-> (:value map*)
         str
         cheshire/parse-string
-        (#(assoc map* :value %))
-        (cheshire/generate-string {:pretty true}))
+        (#(assoc map* :value %)))
     (catch Exception e
-      (cheshire/generate-string map* {:pretty true}))))
+      map*)))
+
+(defn key-to-result-string
+  "Attempt to convert result map key to a JSON string.
+   If parsing fails, return as is."
+  [map*]
+  (try
+    (-> (:key map*)
+        str
+        cheshire/parse-string
+        (#(assoc map* :key %)))
+    (catch Exception e
+      map*)))
+
+(defn to-pretty-print
+  "Attempt to convert the restult map into a pretty JSON String.
+   If it fails to parse, return as is."
+  [map*]
+  (cheshire/generate-string map* {:pretty true}))
 
 (defn result?
   "Does this record match the given query params?"
@@ -70,7 +87,9 @@
     (-> record
         to-map
         (assoc :type :offset :timestamp timestamp-date)
-        (to-result-string)
+        (key-to-result-string)
+        (value-to-result-string)
+        (to-pretty-print)
         (#(str ", " %)))))
 
 (defn maybe-send-progress
@@ -110,10 +129,10 @@
         key-deser (:key-deserializer options)
         value-deser (:value-deserializer options)
         base-config (kafka/config bootstrap-servers key-deser value-deser true)
-        config (if (= value-deser (:avro kafka/deserializers))
-                 (assoc base-config "schema.registry.url"
-                        (:schema-registry-url options))
-                 base-config)
+        config (cond (or (= value-deser (:avro kafka/deserializers)) (= key-deser (:avro kafka/deserializers)))
+                     (assoc base-config "schema.registry.url" (:schema-registry-url options))
+                     :else
+                     base-config)
         topics (string/split (:topics options) #",")
         string-deser "org.apache.kafka.common.serialization.StringDeserializer"
         partitions-config (kafka/config bootstrap-servers string-deser string-deser true)
@@ -139,6 +158,7 @@
         stop-running-date (.getTime calendar)]
     (output-fn "[")
     (output-fn pioneer)
+    (println config)
     (let [consumer (kafka/consumer config topics partitions)
           stop-offsets (into {}
                              (for [[k v] (kafka/fetch-offsets consumer)]
@@ -162,7 +182,9 @@
                                       (-> record
                                           to-map
                                           (assoc :type :result)
-                                          (to-result-string)
+                                          (key-to-result-string)
+                                          (value-to-result-string)
+                                          (to-pretty-print)
                                           (#(str ", " %))
                                           output-fn))
                                     (assoc offsets offsets-key (.offset record))))))]
