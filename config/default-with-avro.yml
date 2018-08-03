@@ -26,3 +26,4 @@ kafka-bootstrap-servers:
     "local": "localhost:9092"
 kafka-schema-registry-urls:
     "local": "http://localhost:8081"
+

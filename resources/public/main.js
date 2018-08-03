@@ -101,6 +101,9 @@
           case 'bootstrap-servers':
             initBootstrapServers(value);
             break;
+          case 'key-deserializers':
+            initKeyDeserializers(value);
+            break;
           case 'value-deserializers':
             initValueDeserializers(value);
             break;
@@ -127,6 +130,19 @@
       option.value = bootstrapServers[key];
       document.getElementById('bootstrap-servers').add(option);
     });
+  }
+
+  /**
+   * Initialize key deserializers dropdown.
+   * @param {object} keyDeserializers
+   */
+  function initKeyDeserializers(keyDeserializers) {
+      Object.keys(keyDeserializers).forEach(function(key) {
+          let option = document.createElement('option');
+          option.text = key;
+          option.value = keyDeserializers[key];
+          document.getElementById('key-deserializer').append(option);
+      });
   }
 
   /**
@@ -321,6 +337,15 @@
         }
       };
 
+      let keyDeserializer = document.getElementById('key-deserializer');
+      for (let i = 0; i < keyDeserializer.length; i++) {
+          let element = keyDeserializer[i];
+          if (element.value == dataURL.keyDeserializer) {
+              document.getElementById('key-deserializer').selectedIndex = i;
+              break;
+          }
+      };
+
       let valueDeserializer = document.getElementById('value-deserializer');
       for (let i = 0; i < valueDeserializer.length; i++) {
         let element = valueDeserializer[i];
@@ -411,6 +436,7 @@
       relativeOffset: document.getElementById('relative-offset').value,
       follow: document.getElementById('follow').checked,
       defaultPartition: document.getElementById('default-partition').checked,
+      keyDeserializer: document.getElementById('key-deserializer').value,
       valueDeserializer: document.getElementById('value-deserializer').value,
       schemaRegistryURL: document.getElementById('schema-registry-url').value,
       partitions: document.getElementById('partitions').value,
@@ -436,6 +462,9 @@
       // in the value field that they intend to match anywhere,
       // whereas the key-regex is more likely to be an exact match.
       data['val-regex'] = '.*' + dataURL.valRegex + '.*';
+    }
+    if (dataURL.keyDeserializer) {
+      data['key-deserializer'] = dataURL.keyDeserializer;
     }
     if (dataURL.valueDeserializer) {
       data['value-deserializer'] = dataURL.valueDeserializer;

@@ -138,6 +138,7 @@
      :headers {"Content-Type" "application/json"}
      :body (cheshire/generate-string {:bootstrap-servers config/kafka-bootstrap-servers
                                       :bootstrap-topics @topics/bootstrap-topics
+                                      :key-deserializers deserializers
                                       :value-deserializers deserializers
                                       :schema-registry-urls config/kafka-schema-registry-urls})}))
 

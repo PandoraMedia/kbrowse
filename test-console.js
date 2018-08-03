@@ -72,6 +72,7 @@ async function checkIDs(page) {
     assert(await page.$('#default-partition'));
     assert(await page.$('#relative-offset'));
     assert(await page.$('#follow'));
+    assert(await page.$('#key-deserializer'));
     assert(await page.$('#value-deserializer'));
     assert(await page.$('#partitions'));
 
