@@ -158,7 +158,6 @@
         stop-running-date (.getTime calendar)]
     (output-fn "[")
     (output-fn pioneer)
-    (println config)
     (let [consumer (kafka/consumer config topics partitions)
           stop-offsets (into {}
                              (for [[k v] (kafka/fetch-offsets consumer)]
