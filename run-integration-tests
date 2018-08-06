@@ -104,9 +104,10 @@ echo k2,v2 | ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 
 
 echo testing-key-exact-match
 OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --key-regex 'k0')
+echo $OUTPUT
 python <<EOF
 import json
-assert 'v0' == json.loads("""$OUTPUT""")[1]['value']
+assert 'k0' == json.loads("""$OUTPUT""")[1]['key']
 EOF
 
 
@@ -151,7 +152,7 @@ EOF
 
 
 echo testing-msgpack
-OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --value-deserializer "kbrowse.msgpack.MsgpackDeserializer")
+OUTPUT=$(./lein run cli --bootstrap-servers localhost:9092 --topics topic-a --key-deserializer "org.apache.kafka.common.serialization.StringDeserializer" --value-deserializer "kbrowse.msgpack.MsgpackDeserializer")
 python <<EOF
 import json
 assert 118 == json.loads("""$OUTPUT""")[1]['value']
