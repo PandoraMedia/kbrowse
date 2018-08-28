@@ -49,6 +49,7 @@ CONFIG=foo.yml java $JVM_OPTS -jar kbrowse-*-SNAPSHOT-standalone.jar server
 
 # Tests
 ```
+# Requires npm!
 ./run-tests
 ```
 
