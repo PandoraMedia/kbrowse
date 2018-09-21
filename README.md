@@ -65,6 +65,9 @@ This design is intended to support copy/paste-able URLs, so folks can share thei
 
 Some browsers may have a limit on the window location length, which could lead to a corrupt state.  This trade-off is accepted, to allow for share-able contexts.
 
+# Kafka Version Compatibility
+Kafka 0.9.0.1+
+
 # Browser Support
 The web console uses Mozilla's Fetch API, and ES6 keywords such as `let` and `const`.
 
