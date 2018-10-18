@@ -47,6 +47,18 @@ Uberjar:
 CONFIG=foo.yml java $JVM_OPTS -jar kbrowse-*-SNAPSHOT-standalone.jar server
 ```
 
+Docker:
+```
+# Build
+docker build -t kbrowse .
+
+# Run on default port 4000
+docker run -p 4000:4000 kbrowse 
+
+# Run with local custom config (custom.yml)
+docker run -p 4000:4000 -v $PWD/config/custom.yml:/app/default.yml kbrowse
+```
+
 # Tests
 ```
 # Requires npm!
