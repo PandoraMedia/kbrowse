@@ -21,6 +21,7 @@
 /classes
 /checkouts
 /dist
+/docker-files
 /kafka
 /kafka-logs
 /node_modules
