@@ -1,10 +1,21 @@
+FROM openjdk:8-jdk-alpine as BUILD
+
+ENV LEIN_ROOT true
+RUN apk add --no-cache bash
+
+RUN mkdir -p /home/kbrowse
+COPY project.clj lein /home/kbrowse/
+COPY src/ /home/kbrowse/src
+COPY config/ /home/kbrowse/config
+WORKDIR /home/kbrowse/
+RUN ./lein uberjar
+
 FROM openjdk:8-jre-alpine
 
+ENV CONFIG_FILE default.yml
 EXPOSE 4000
 
-ENV CONFIG_FILE default.yml
-
-COPY docker-files/kbrowse-master/target/kbrowse-*-SNAPSHOT-standalone.jar /app/
+COPY --from=BUILD /home/kbrowse/target/* /app/
 COPY config/* /app/
 COPY launch.sh /app/
 
