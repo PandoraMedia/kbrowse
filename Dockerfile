@@ -15,7 +15,7 @@ FROM openjdk:8-jre-alpine
 ENV CONFIG_FILE default.yml
 EXPOSE 4000
 
-COPY --from=BUILD /home/kbrowse/target/* /app/
+COPY --from=BUILD /home/kbrowse/target/*.jar /app/
 COPY config/* /app/
 COPY launch.sh /app/
 
