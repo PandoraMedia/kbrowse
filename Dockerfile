@@ -7,6 +7,7 @@ RUN mkdir -p /home/kbrowse
 COPY project.clj lein /home/kbrowse/
 COPY src/ /home/kbrowse/src
 COPY config/ /home/kbrowse/config
+COPY resources/ /home/kbrowse/resources
 WORKDIR /home/kbrowse/
 RUN ./lein uberjar
 
