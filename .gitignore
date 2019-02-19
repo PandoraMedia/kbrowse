@@ -33,3 +33,4 @@
 *.log
 *.swp
 *.tgz
+package-lock.json
