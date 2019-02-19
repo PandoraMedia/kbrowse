@@ -48,9 +48,9 @@ function verify_md5_hash {
     fi
 }
 
-TGZ=kafka_2.11-1.1.0.tgz
+TGZ=kafka_2.11-2.1.0.tgz
 if [ ! -f $TGZ ]; then
     echo Downloading Kafka...
-    curl http://www-us.apache.org/dist/kafka/1.1.0/$TGZ -o $TGZ
-    verify_md5_hash $TGZ 9487884ea6908e4dd15fa969ffcc2f9c
+    curl http://www-us.apache.org/dist/kafka/2.1.0/$TGZ -o $TGZ
+    verify_md5_hash $TGZ 3ee55cd897f12c637abb40b2a78e8fe9
 fi
