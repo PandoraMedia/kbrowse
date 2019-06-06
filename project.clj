@@ -24,7 +24,7 @@
                  [compojure "1.6.0"]
                  [io.confluent/kafka-avro-serializer "4.0.0"]
                  [org.apache.avro/avro "1.8.2"]
-                 [org.apache.kafka/kafka_2.11 "1.1.0" :exclusions [log4j org.slf4j/slf4j-log4j12]]
+                 [org.apache.kafka/kafka_2.11 "2.2.1" :exclusions [log4j org.slf4j/slf4j-log4j12]]
                  [org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.cli "0.3.5"]
                  [org.clojure/tools.logging "0.4.0"]

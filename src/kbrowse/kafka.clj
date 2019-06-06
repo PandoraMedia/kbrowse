@@ -89,7 +89,7 @@
 (defn consume
   "Fetch a batch of messages."
   [consumer]
-  (.poll consumer config/kafka-timeout))
+  (.poll consumer (java.time.Duration/ofMillis config/kafka-timeout)))
 
 (defn seek-to-beginning
   "Set the consumer to the beginning of its assigned topic partitions."
