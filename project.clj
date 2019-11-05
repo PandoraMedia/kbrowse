@@ -30,8 +30,8 @@
                  [org.clojure/tools.logging "0.4.0"]
                  [ring/ring-core "1.6.3" :exclusions [commons-codec]]
                  [ring/ring-jetty-adapter "1.6.3"]]
-  :repositories {"central" "http://central.maven.org/maven2/"
-                 "confluent" "http://packages.confluent.io/maven/"}
+  :repositories {"central" "https://repo1.maven.org/maven2/"
+                 "confluent" "https://packages.confluent.io/maven/"}
   :plugins [[lein-ring "0.12.4" :exclusions [org.clojure/clojure]]
             [lein-cljfmt "0.5.7"]]
   :ring {:handler kbrowse.core/app
