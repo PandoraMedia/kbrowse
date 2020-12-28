@@ -47,5 +47,5 @@
             (Thread/sleep (* config/kafka-topics-cache-sleep-seconds 1000))
             (try
               (refresh)
-            (catch Exception e
-              (println "topics/refresh exception - topics may become stale" e))))))
+              (catch Exception e
+                (println "topics/refresh exception - topics may become stale" e))))))
