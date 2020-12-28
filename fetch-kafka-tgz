@@ -48,11 +48,11 @@ function verify_md5_hash {
     fi
 }
 
-TGZ=kafka_2.12-2.2.1.tgz
+TGZ=kafka_2.12-2.7.0.tgz
 if [ ! -f $TGZ ]; then
     echo Downloading Kafka...
-    curl -L http://www-us.apache.org/dist/kafka/2.2.1/$TGZ -o $TGZ
+    curl -L http://www-us.apache.org/dist/kafka/2.7.0/$TGZ -o $TGZ
 fi
 
 # Always verify, in case of re-runs
-verify_md5_hash $TGZ 7b2d2f789fdc93a130880b2a24db6b46
+verify_md5_hash $TGZ 9127875811b8a7b7a5b84d0c4c19874b
